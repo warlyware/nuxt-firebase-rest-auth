@@ -29,6 +29,10 @@ module.exports = {
   css: [
   ],
 
+  env: {
+    FIREBASE_API_KEY: 'AIzaSyCbqjq5ln90eCoKPzv51me5_T2QDPpNGh4'
+  },
+
   /*
   ** Plugins to load before mounting the App
   */
@@ -49,7 +53,7 @@ module.exports = {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
-      
+
     }
   }
 }

@@ -1,3 +1,6 @@
+import Cookie from 'js-cookie';
+import axios from 'axios';
+
 export const state = () => ({
   token: null
 });
@@ -18,7 +21,7 @@ export const mutations = {
   }
 }
 
-const handleServerInit = (req, store) => {
+const handleServerInit = (req, commit, dispatch) => {
   if (!req.headers.cookie) {
     return
   }
@@ -43,7 +46,7 @@ const handleServerInit = (req, store) => {
   commit('setToken', token);
 }
 
-const handleClientInit = (req, store) => {
+const handleClientInit = (commit, dispatch) => {
   let token = Cookie.get('jwt');
   let expirationDate = Cookie.get('expirationDate');
 
@@ -57,11 +60,27 @@ const handleClientInit = (req, store) => {
 export const actions = {
   init({ commit, dispatch }, req) {
     if (process.server) {
-      handleServerInit(req, store);
+      handleServerInit(req, commit, dispatch);
     } else {
-      handleClientInit(req, store);
+      handleClientInit(commit, dispatch);
     }
     console.log('running initAuth');
+  },
+  authenticateUser({ commit, dispatch }, authData) {
+    console.log('api key', process.env.FIREBASE_API_KEY);
+    const apiEndpoint = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${process.env.FIREBASE_API_KEY}`;
+    axios.post(apiEndpoint, {
+      email: authData.email,
+      password: authData.password,
+      returnSecureToken: true
+    }).then(res => {
+      console.log(res);
+      commit('setToken', res.data.idToken);
+      Cookie.set('jwt', res.data.idToken);
+      Cookie.set('expirationDate',  new Date().getTime() + Number(res.data.expiresIn) * 1000);
+    }).catch(err => {
+      console.error(err);
+    });
   },
   logout({ commit }) {
     commit('clearToken');
