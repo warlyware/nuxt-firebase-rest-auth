@@ -1,4 +1,4 @@
-# spottery
+# nuxt-firebase-rest-auth
 
 > My impeccable Nuxt.js project
 
