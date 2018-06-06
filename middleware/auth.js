@@ -1,6 +1,9 @@
-export default ({ store, redirect }) => {
-  console.log(!store.getters['auth/isAuthenticated']);
+export default ({ store, redirect, route }) => {
   if (!store.getters['auth/isAuthenticated']) {
     redirect('/auth');
+    return;
+  }
+  if (route.path === '/auth' && store.getters['auth/isAuthenticated']) {
+    redirect('/my-shelf');
   }
 }

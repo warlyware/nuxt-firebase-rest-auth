@@ -31,7 +31,8 @@ export const handleClientInit = (commit, dispatch) => {
 
   if (new Date().getTime() > Number(expirationDate) || !token) {
     dispatch('logout');
+  } else {
+    commit('setToken', token);
   }
 
-  commit('setToken', token);
 }

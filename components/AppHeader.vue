@@ -7,11 +7,11 @@
 
 <script>
 export default {
-  asyncData({}) {
-    return {
-      authenticated: store.getters['auth/isAuthenticated']
-    }
-  },
+  // fetch({}) {
+  //   return {
+  //     authenticated: store.getters['auth/isAuthenticated']
+  //   }
+  // },
   methods: {
     handleLogout() {
       this.$store.dispatch('auth/logout');

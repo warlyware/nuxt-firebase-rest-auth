@@ -16,9 +16,11 @@ export const getters = {
 
 export const mutations = {
   setToken(state, token) {
+    console.log('setting token to', token);
     state.token = token;
   },
   clearToken(state) {
+    console.log('clearing token', state.token);
     state.token = null;
   }
 }
