@@ -1,4 +1,5 @@
-const pkg = require('./package')
+const pkg = require('./package');
+const bodyParser = require('body-parser');
 
 module.exports = {
   mode: 'universal',
@@ -33,6 +34,11 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
+  ],
+
+  serverMiddleware: [
+    bodyParser.json(),
+    '@/api'
   ],
 
   /*
