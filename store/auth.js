@@ -1,13 +1,15 @@
 import Cookie from 'js-cookie';
 import axios from 'axios';
 
+import { handleClientInit, handleServerInit } from '@/services/auth';
+
 export const state = () => ({
   token: null
 });
 
 export const getters = {
   isAuthenticated(state) {
-    console.log('checking auth token', state.token);
+    console.log('checking auth token', state);
     return state.token !== null;
   }
 }
@@ -21,42 +23,6 @@ export const mutations = {
   }
 }
 
-const handleServerInit = (req, commit, dispatch) => {
-  if (!req.headers.cookie) {
-    return
-  }
-  const jwtCookie = req.headers.cookie
-    .split(';')
-    .find(cookie => cookie.trim().startsWith('jwt='));
-
-  if (!jwtCookie) {
-    return
-  }
-
-  let token = jwtCookie.split('=')[1];
-  let expirationDate = req.headers.cookie
-    .split(';')
-    .find(cookie => cookie.trim().startsWith('expirationDate='))
-    .split('=')[1];
-
-  if (new Date().getTime() > Number(expirationDate) || !token) {
-    dispatch('logout');
-  }
-
-  commit('setToken', token);
-}
-
-const handleClientInit = (commit, dispatch) => {
-  let token = Cookie.get('jwt');
-  let expirationDate = Cookie.get('expirationDate');
-
-  if (new Date().getTime() > Number(expirationDate) || !token) {
-    dispatch('logout');
-  }
-
-  commit('setToken', token);
-}
-
 export const actions = {
   init({ commit, dispatch }, req) {
     if (process.server) {
@@ -67,9 +33,8 @@ export const actions = {
     console.log('running initAuth');
   },
   authenticateUser({ commit, dispatch }, authData) {
-    console.log('api key', process.env.FIREBASE_API_KEY);
     const apiEndpoint = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${process.env.FIREBASE_API_KEY}`;
-    axios.post(apiEndpoint, {
+    return axios.post(apiEndpoint, {
       email: authData.email,
       password: authData.password,
       returnSecureToken: true
@@ -78,8 +43,19 @@ export const actions = {
       commit('setToken', res.data.idToken);
       Cookie.set('jwt', res.data.idToken);
       Cookie.set('expirationDate',  new Date().getTime() + Number(res.data.expiresIn) * 1000);
-    }).catch(err => {
-      console.error(err);
+    });
+  },
+  signUpNewUser({ commit, dispatch }, authData) {
+    const apiEndpoint = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${process.env.FIREBASE_API_KEY}`;
+    return axios.post(apiEndpoint, {
+      email: authData.email,
+      password: authData.password,
+      returnSecureToken: true
+    }).then(res => {
+      console.log('signup success', res);
+      commit('setToken', res.data.idToken);
+      Cookie.set('jwt', res.data.idToken);
+      Cookie.set('expirationDate',  new Date().getTime() + Number(res.data.expiresIn) * 1000);
     });
   },
   logout({ commit }) {
