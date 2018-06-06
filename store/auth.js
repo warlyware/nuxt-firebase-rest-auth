@@ -1,10 +1,10 @@
-export const state = () => {
+export const state = () => ({
   token: null
-}
+});
 
 export const getters = {
   isAuthenticated(state) {
-    console.log('checking auth token');
+    console.log('checking auth token', state.token);
     return state.token !== null;
   }
 }
