@@ -1,7 +1,6 @@
+require('dotenv').config();
 const router = require('./bootstrap');
 const mongoose = require('mongoose');
-require('dotenv').config();
-
 
 const MONGO_URI = `mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASS}@ds151530.mlab.com:51530/spottery`;
 
@@ -36,7 +35,6 @@ router.post('/me', (req, res) => {
 });
 
 router.post('/user', (req, res) => {
-  console.log('User to store', req.body);
   const user = new User({
     email: req.body.email,
     token: req.body.idToken,
